@@ -146,7 +146,7 @@ void ATC3DGTracker::update(
 	// matrix
 	if (matrix != nullptr) {
 		for (int i = 0; i < 9; i++) {
-			matrix[i] = p_get_double(i * 2, i * 2 + 1);
+			matrix[i] = p_get_double(12 + i * 2, 12 + i * 2 + 1);
 		}
 	}
 	// quaternions

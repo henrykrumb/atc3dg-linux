@@ -157,7 +157,7 @@ public:
 	virtual int get_number_sensors();
 	
 	virtual void set_rate(double rate);
-	virtual double get_rate();
+	virtual double get_rate() const;
 	virtual double get_min_rate() const;
 	virtual double get_max_rate() const;
 	
