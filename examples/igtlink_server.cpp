@@ -53,27 +53,3 @@ int main(int argc, char* argv[]) {
 
     socket->CloseSocket();
 }
-
-
-//------------------------------------------------------------
-// Function to generate random matrix.
-
-void GetRandomTestVectors(float* position, float* quaternion)
-{
-
-  // random position
-  static float phi = 0.0;
-  position[0] = 50.0 * cos(phi);
-  position[1] = 50.0 * sin(phi);
-  position[2] = 50.0 * cos(phi);
-  phi = phi + 0.2;
-
-  // random orientation
-  static float theta = 0.0;
-  quaternion[0]=0.0;
-  quaternion[1]=0.6666666666*cos(theta);
-  quaternion[2]=0.577350269189626;
-  quaternion[3]=0.6666666666*sin(theta);
-  theta = theta + 0.1;
-
-}
