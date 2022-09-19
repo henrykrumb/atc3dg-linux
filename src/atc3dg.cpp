@@ -196,7 +196,7 @@ void ATC3DGTracker::set_rate(double rate) {
 }
 
 
-double ATC3DGTracker::get_rate() {
+double ATC3DGTracker::get_rate() const {
 	return m_rate;
 }
 
