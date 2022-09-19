@@ -22,6 +22,12 @@ add_executable(record examples/record.cpp)
 target_link_libraries(record atc3dg)
 set_target_properties(record PROPERTIES OUTPUT_NAME record)
 
+# build igtlink server
+find_package(OpenIGTLink REQUIRED)
+include(${OpenIGTLink_USE_FILE})
+add_executable(igtlink_server examples/igtlink_server.cpp)
+target_link_libraries(igtlink_server atc3dg OpenIGTLink)
+set_target_properties(igtlink_server PROPERTIES OUTPUT_NAME igtlink_server)
 
 
 install(
