@@ -144,8 +144,10 @@ void ATC3DGTracker::update(
 	ay = 180.0 * p_get_double(8, 9);
 	az = 180.0 * p_get_double(10, 11);
 	// matrix
-	for (int i = 0; i < 9; i++) {
-		matrix[i] = p_get_double(i * 2, i * 2 + 1);
+	if (matrix != nullptr) {
+		for (int i = 0; i < 9; i++) {
+			matrix[i] = p_get_double(i * 2, i * 2 + 1);
+		}
 	}
 	// quaternions
 	q0 = p_get_double(20, 21);
@@ -164,6 +166,26 @@ void ATC3DGTracker::update(
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
+
+void ATC3DGTracker::update(
+	int sensor,
+	double* position,
+	double* orientation,
+	double* matrix,
+	double* quaternion,
+	double* quality,
+	bool* button
+) {
+	this->update(
+		sensor,
+		position[0], position[1], position[2],
+		orientation[0], orientation[1], orientation[2],
+		matrix,
+		quaternion[0], quaternion[1], quaternion[2], quaternion[3],
+		*quality,
+		*button
+	);
+}
 
 void ATC3DGTracker::set_rate(double rate) {
 	if (rate >= get_min_rate() && rate <= get_max_rate()) {

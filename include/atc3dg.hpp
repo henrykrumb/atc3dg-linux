@@ -143,6 +143,15 @@ public:
 		double& quality,
 		bool& button
 	);
+	virtual void update(
+		int sensor,
+		double* position,
+		double* orientation,
+		double* matrix,
+		double* quaternion,
+		double* quality,
+		bool* button
+	);
 	virtual void disconnect();
 	
 	virtual int get_number_sensors();
