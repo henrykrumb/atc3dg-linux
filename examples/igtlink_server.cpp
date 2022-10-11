@@ -11,8 +11,11 @@
 #include "igtlTrackingDataMessage.h"
 #include "igtlPointMessage.h"
 
+#include "CLI/App.hpp"
+#include "CLI/Formatter.hpp"
+#include "CLI/Config.hpp"
 
-#define DRY
+//#define DRY
 
 /*
  * Make client socket global, so we can close it during cleanup.
@@ -21,8 +24,18 @@ static igtl::Socket::Pointer client_socket;
 
 
 int main(int argc, char* argv[]) {
-    const int port = 18944;
-    const int timeout = 1000;
+    int port = 18944;
+    int timeout = 1000;
+    bool dry = false;
+
+    CLI::App app{"trakSTAR IGTLink Server"};
+
+    app.add_option("-p,--port", port, "Server port");
+    app.add_option("-t,--timeout", timeout, "Connection timeout");
+    app.add_flag("-d,--dry", dry, "Dry run (without tracker)");
+
+    CLI11_PARSE(app, argc, argv);
+
 
     auto server_socket = igtl::ServerSocket::New();
     int status = server_socket->CreateServer(port);
@@ -33,16 +46,19 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    #ifndef DRY
-        ATC3DGTracker tracker;
+    ATC3DGTracker tracker;
+    int num_sensors;
+    int interval;
+
+    if (!dry) {
         tracker.connect();
 
-        const int num_sensors = tracker.get_number_sensors();
-        const int interval = (int) (1000.0 / tracker.get_rate());
-    #else
-        const int num_sensors = 1;
-        const int interval = (int) (1000.0 / 80.0);
-    #endif
+        num_sensors = tracker.get_number_sensors();
+        interval = (int) (1000.0 / tracker.get_rate());
+    } else {
+        num_sensors = 1;
+        interval = (int) (1000.0 / 80.0);
+    }
 
     // trakSTAR return values
     double position[] = { 0.0, 0.0, 0.0 };
@@ -94,9 +110,9 @@ int main(int argc, char* argv[]) {
                 connected = true;
             }
             for (int sensor = 0; sensor < num_sensors; sensor++) {
-                #ifndef DRY
-                tracker.update(sensor, position, orientation, atcmatrix, quaternion, &quality, &button);
-                #endif
+                if (!dry) {
+                    tracker.update(sensor, position, orientation, atcmatrix, quaternion, &quality, &button);
+                }
 
                 for (int j = 0; j < 3; j++) {
                     for (int i = 0; i < 3; i++) {
@@ -136,7 +152,7 @@ int main(int argc, char* argv[]) {
         client_socket->CloseSocket();
     }
 
-    #ifndef DRY
+    if (!dry) {
         tracker.disconnect();
-    #endif
+    }
 }

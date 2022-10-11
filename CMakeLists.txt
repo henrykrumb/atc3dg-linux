@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.14)
 
 project(atc3dglinux)
 include(FetchContent)
@@ -18,7 +18,7 @@ set_target_properties(atc3dg
 )
 
 
-# build example
+# build simple example
 add_executable(record examples/record.cpp)
 target_link_libraries(record atc3dg)
 set_target_properties(record PROPERTIES OUTPUT_NAME record)
@@ -31,10 +31,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(OpenIGTLink)
 
+include(FetchContent)
+FetchContent_Declare(
+  cli11
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_TAG        v2.2.0
+)
+FetchContent_MakeAvailable(cli11)
+
 
 # build igtlink server
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
+include_directories(${cli11_SOURCE_DIR}/include)
 add_executable(atcigtlinkserver examples/igtlink_server.cpp)
 target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink)
 set_target_properties(atcigtlinkserver PROPERTIES OUTPUT_NAME atcigtlinkserver)
