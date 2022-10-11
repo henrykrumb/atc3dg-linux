@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(atc3dglinux)
+include(FetchContent)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -21,6 +22,14 @@ set_target_properties(atc3dg
 add_executable(record examples/record.cpp)
 target_link_libraries(record atc3dg)
 set_target_properties(record PROPERTIES OUTPUT_NAME record)
+
+FetchContent_Declare(
+  OpenIGTLink
+  GIT_REPOSITORY	https://github.com/openigtlink/OpenIGTLink
+  GIT_TAG			d4eaae937b6a28ea2324f90c128800b3ad1cf2b3
+)
+FetchContent_MakeAvailable(OpenIGTLink)
+
 
 # build igtlink server
 find_package(OpenIGTLink REQUIRED)
