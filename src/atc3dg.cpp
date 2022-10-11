@@ -8,7 +8,9 @@
 
 
 void log_debug(std::string string) {
-	std::cout << string << std::endl;
+	#ifndef NDEBUG
+		std::cout << "[DEBUG] " << string << std::endl;
+	#endif
 }
 
 
