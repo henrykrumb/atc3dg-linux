@@ -14,13 +14,18 @@ int main(int argc, char* argv[])
     double quality;
     bool button;
 
+    int sensors = tracker.get_number_sensors();
+
     tracker.connect();
-    for (int i = 0; i < 500; ++i)
+
+    for (int s = 0; s < sensors; s++)
     {
-        tracker.update(0, x, y, z, ax, ay, az, matrix, q0, qi, qj, qk, quality, button);
-        std::cout << x << " " << y << " " << z << " " << button << std::endl;
+        for (int i = 0; i < 10; ++i)
+        {
+            tracker.update(s, x, y, z, ax, ay, az, matrix, q0, qi, qj, qk, quality, button);
+            std::cout << x << " " << y << " " << z << " " << ax << " " << ay << " " << az << " " << button << std::endl;
+        }
     }
-    std::cout << tracker.get_number_sensors() << " sensors attached." << std::endl;
     tracker.disconnect();
 
     return 0;
