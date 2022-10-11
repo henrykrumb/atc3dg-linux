@@ -15,30 +15,22 @@
 #include "CLI/Formatter.hpp"
 #include "CLI/Config.hpp"
 
-//#define DRY
-
-/*
- * Make client socket global, so we can close it during cleanup.
- */
-static igtl::Socket::Pointer client_socket;
-
 
 int main(int argc, char* argv[]) {
     int port = 18944;
     int timeout = 1000;
     bool dry = false;
 
+    // parse command line args
     CLI::App app{"trakSTAR IGTLink Server"};
-
     app.add_option("-p,--port", port, "Server port");
     app.add_option("-t,--timeout", timeout, "Connection timeout");
     app.add_flag("-d,--dry", dry, "Dry run (without tracker)");
-
     CLI11_PARSE(app, argc, argv);
-
 
     auto server_socket = igtl::ServerSocket::New();
     int status = server_socket->CreateServer(port);
+    igtl::Socket::Pointer client_socket;
 
     if (status < 0) {
         std::cerr << "Cannot create a server socket." << std::endl;
@@ -103,8 +95,8 @@ int main(int argc, char* argv[]) {
     while (running)
     {
         client_socket = server_socket->WaitForConnection(timeout);
-        
-        while (client_socket.IsNotNull()) {
+
+        while (client_socket.IsNotNull() && client_socket->GetConnected()) {
             if (!connected) {
                 std::cout << "Client connected." << std::endl;
                 connected = true;
@@ -137,7 +129,10 @@ int main(int argc, char* argv[]) {
             tracking_message->Pack();
             client_socket->Send(tracking_message->GetPackPointer(), tracking_message->GetPackSize());
             point_message->Pack();
-            client_socket->Send(point_message->GetPackPointer(), point_message->GetPackSize());
+            int status = client_socket->Send(point_message->GetPackPointer(), point_message->GetPackSize());
+            if (!status) {
+                break;
+            }
 
             igtl::Sleep(interval);
         }
