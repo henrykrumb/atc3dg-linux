@@ -104,9 +104,10 @@ void ATC3DGTracker::disconnect() {
 int ATC3DGTracker::get_number_sensors() {
 	int n_sensors = 0;
 	for (int i = 0; i < 4; i++) {
-		p_write({0xF1 + i, ATC_CMD_EXAMINE, ATC_SERIAL_NUMBER});
+		p_write({0xF1 + i, ATC_CMD_EXAMINE, ATC_RX_SERIAL_NUMBER});
 		p_read(2);
 		if (m_input_buf[0] != 0 && m_input_buf[1] != 0) {
+			printf("%x%x\n", m_input_buf[0], m_input_buf[1]);
 			n_sensors++;
 		}
 	}
