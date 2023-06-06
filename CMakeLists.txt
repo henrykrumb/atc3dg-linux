@@ -18,8 +18,8 @@ set_target_properties(atc3dg
 )
 
 
-# build simple example
-add_executable(record examples/record.cpp)
+# build application executables
+add_executable(record applications/record.cpp)
 target_link_libraries(record atc3dg)
 set_target_properties(record PROPERTIES OUTPUT_NAME record)
 
@@ -44,7 +44,7 @@ FetchContent_MakeAvailable(cli11)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 include_directories(${cli11_SOURCE_DIR}/include)
-add_executable(atcigtlinkserver examples/igtlink_server.cpp)
+add_executable(atcigtlinkserver applications/igtlink_server.cpp)
 target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink)
 set_target_properties(atcigtlinkserver PROPERTIES OUTPUT_NAME atcigtlinkserver)
 
