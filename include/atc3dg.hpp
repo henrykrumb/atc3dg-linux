@@ -13,6 +13,7 @@
  */
 #pragma once
 
+#include <string>
 #include <string.h>
 #include <usb.h>
 
@@ -66,7 +67,7 @@ enum ATC3DGCommands {
 	ATC_CMD_QUAT =				0x5C,
 	ATC_CMD_POS_QUAT =			0x5D,
 	// 0x5E
-	// 0x5F
+	ATC_CMD_ALL =               0x5F,
 	// 0x60
 	// 0x61
 	ATC_CMD_RESET =				0x62,
@@ -138,7 +139,7 @@ public:
 		int sensor,
 		double&  x, double&  y, double&  z,
 		double& ax, double& ay, double& az,
-		double* matrix,
+		double (*matrix)[3][3],
 		double& q0, double& qi, double& qj, double& qk,
 		double& quality,
 		bool& button
@@ -147,7 +148,7 @@ public:
 		int sensor,
 		double* position,
 		double* orientation,
-		double* matrix,
+		double (*matrix)[3][3],
 		double* quaternion,
 		double* quality,
 		bool* button
@@ -166,7 +167,7 @@ public:
 private:
 	void p_read(int bytes);
 	void p_write(std::vector<int> list);
-	double p_get_double(int byte1, int byte2);
+	double p_get_double(int byte1, int byte2=-1);
 	
 	void atc_init();
 	void atc_select_tx(int tx, int delay=7000);
