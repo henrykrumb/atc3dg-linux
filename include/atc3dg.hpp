@@ -139,7 +139,7 @@ public:
 		int sensor,
 		double&  x, double&  y, double&  z,
 		double& ax, double& ay, double& az,
-		double (*matrix)[3][3],
+		double (&matrix)[3][3],
 		double& q0, double& qi, double& qj, double& qk,
 		double& quality,
 		bool& button
@@ -148,7 +148,7 @@ public:
 		int sensor,
 		double* position,
 		double* orientation,
-		double (*matrix)[3][3],
+		double (&matrix)[3][3],
 		double* quaternion,
 		double* quality,
 		bool* button

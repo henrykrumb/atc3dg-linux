@@ -20,8 +20,10 @@ static bool running;
 
 void signal_handler(int signum)
 {
+    std::cout << "Signal " << signum << " received." << std::endl;
     if (signum == SIGINT)
     {
+        std::cout << "SIGINT received." << std::endl;
         running = false;
     }
 }
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
 
     signal(SIGINT, signal_handler);
 
+
     // trakSTAR return values
     double position[] = {0.0, 0.0, 0.0};
     double quaternion[] = {0.0, 0.0, 0.0, 0.0};
@@ -99,7 +102,7 @@ int main(int argc, char *argv[])
             running = false;
         }
 
-        while (client_socket.IsNotNull() && client_socket->GetConnected())
+        while (running && client_socket.IsNotNull() && client_socket->GetConnected())
         {
             if (!connected)
             {
@@ -109,21 +112,35 @@ int main(int argc, char *argv[])
 
             for (int sensor = 0; sensor < num_sensors; sensor++)
             {
+                //std::cout << "sensor " << sensor << std::endl;
                 auto transform_message = igtl::TransformMessage::New();
-                std::string name = "Sensor" + sensor;
+                
+                std::string name;
+                switch (sensor)
+                {
+                case 0:
+                    name = "Reference";
+                    break;
+                case 1:
+                    name = "Tool";
+                    break;
+                
+                default:
+                    name = "Unknown";
+                    break;
+                }
+                
                 transform_message->SetDeviceName(name.c_str());
 
                 if (!dry)
                 {
-                    std::cout << "update" << std::endl;
-                    tracker.update(sensor, position, orientation, &atcmatrix, quaternion, &quality, &button);
+                    tracker.update(sensor, position, orientation, atcmatrix, quaternion, &quality, &button);
                 }
 
                 for (int j = 0; j < 3; j++)
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        std::cout << "test" << std::endl;
                         igtmatrix[i][j] = static_cast<float>(atcmatrix[i][j]);
                     }
                 }
@@ -137,7 +154,7 @@ int main(int argc, char *argv[])
                 igtmatrix[3][3] = 1.0f;
                 transform_message->SetMatrix(igtmatrix);
                 transform_message->Pack();
-
+                
                 if (!client_socket->Send(transform_message->GetPackPointer(), transform_message->GetPackSize()))
                 {
                     break;

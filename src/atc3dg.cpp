@@ -5,6 +5,9 @@
 #include <iostream>
 #include <cmath>
 
+// Temporary, for testing purposes
+#include <iomanip>
+
 #include "atc3dg.hpp"
 
 void log_debug(std::string string)
@@ -51,7 +54,7 @@ void ATC3DGTracker::connect()
 			}
 		}
 	}
-
+	
 	if (m_device == nullptr)
 	{
 		throw std::runtime_error("Could not find USB device.");
@@ -130,7 +133,8 @@ double ATC3DGTracker::p_get_double(int byte1, int byte2)
 	if (byte2 < 0) {
 		byte2 = byte1 + 1;
 	}
-	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1])) << 2;
+	
+	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1] & 0x7f))<<2;
 	return (double)v / 0x8000;
 }
 
@@ -138,7 +142,7 @@ void ATC3DGTracker::update(
 	int sensor,
 	double &x, double &y, double &z,
 	double &ax, double &ay, double &az,
-	double (*matrix)[3][3],
+	double (&matrix)[3][3],
 	double &q0, double &qi, double &qj, double &qk,
 	double &quality,
 	bool &button)
@@ -156,34 +160,47 @@ void ATC3DGTracker::update(
 	x = 36.0 * m_scaling * p_get_double(0) * 2.54;
 	y = 36.0 * m_scaling * p_get_double(2) * 2.54;
 	z = 36.0 * m_scaling * p_get_double(4) * 2.54;
+	/*
 	// angles
-	ax = 180.0 * p_get_double(6);
-	ay = 180.0 * p_get_double(8);
-	az = 180.0 * p_get_double(10);
+	ax = 180.0 * p_get_double(24);
+	ay = 180.0 * p_get_double(26);
+	az = 180.0 * p_get_double(28);
 
 	double d2r = M_PI / 180.0;
-	*matrix[0][0] =  cos(d2r * ay) * cos(d2r * az);
-	*matrix[0][1] =  cos(d2r * ay) * sin(d2r * az);
-	*matrix[0][2] = -sin(d2r * ay);
-	*matrix[1][0] = -(cos(d2r * ax) * sin(d2r * az)) + (sin(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
-	*matrix[1][1] =  (cos(d2r * ax) * cos(d2r * az)) + (sin(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
-	*matrix[1][2] =  sin(d2r * ax) * cos(d2r * ay);
-	*matrix[2][0] =  (sin(d2r * ax) * sin(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
-	*matrix[2][1] = -(sin(d2r * ax) * cos(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
-	*matrix[2][2] =  cos(d2r * ax) * cos(d2r * ay);
+	matrix[0][0] =  cos(d2r * ay) * cos(d2r * az);
+	matrix[0][1] =  cos(d2r * ay) * sin(d2r * az);
+	matrix[0][2] = -sin(d2r * ay);
+	matrix[1][0] = -(cos(d2r * ax) * sin(d2r * az)) + (sin(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
+	matrix[1][1] =  (cos(d2r * ax) * cos(d2r * az)) + (sin(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
+	matrix[1][2] =  sin(d2r * ax) * cos(d2r * ay);
+	matrix[2][0] =  (sin(d2r * ax) * sin(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
+	matrix[2][1] = -(sin(d2r * ax) * cos(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
+	matrix[2][2] =  cos(d2r * ax) * cos(d2r * ay);
+	*/
 
 	// matrix
-	/*int offset = 12;
+	int offset = 6;
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
 			int idx = i * 3 + j;
-			*matrix[i][j] = p_get_double(offset + idx * 2);
+			matrix[i][j] = p_get_double(offset + idx * 2);
 		}
-		std::cout << std::endl;
 	}
-	*/
+	
+	
+
+	if (sensor == 0)
+	{	
+		std::cout << "\n---" << std::endl;
+		// Print raw two byte packages
+		for (int i = 0; i < 53/2; i++)
+		{
+			std::cout << "Byte " << i*2 << "to" << i*2+1 << ": " << std::setprecision(2) << std::fixed << p_get_double(i*2) << std::endl;
+		}
+	}
+	
 
 	q0 = p_get_double(30);
 	qi = p_get_double(32);
@@ -207,7 +224,7 @@ void ATC3DGTracker::update(
 	int sensor,
 	double *position,
 	double *orientation,
-	double (*matrix)[3][3],
+	double (&matrix)[3][3],
 	double *quaternion,
 	double *quality,
 	bool *button)

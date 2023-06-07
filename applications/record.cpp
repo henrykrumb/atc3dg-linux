@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     {
         for (int i = 0; i < 10; ++i)
         {
-            tracker.update(s, x, y, z, ax, ay, az, &matrix, q0, qi, qj, qk, quality, button);
+            tracker.update(s, x, y, z, ax, ay, az, matrix, q0, qi, qj, qk, quality, button);
             std::cout << x << " " << y << " " << z << " " << ax << " " << ay << " " << az << " " << button << std::endl;
         }
     }
