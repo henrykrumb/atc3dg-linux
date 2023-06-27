@@ -134,7 +134,7 @@ double ATC3DGTracker::p_get_double(int byte1, int byte2)
 		byte2 = byte1 + 1;
 	}
 	
-	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1] & 0x7f))<<2;
+	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1] & 0x7F & 0x7f))<<2;
 	return (double)v / 0x8000;
 }
 
