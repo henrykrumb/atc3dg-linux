@@ -157,16 +157,17 @@ void ATC3DGTracker::update(
 	p_read(53);
 
 	// positions
-	x = 36.0 * m_scaling * p_get_double(0) * 2.54;
-	y = 36.0 * m_scaling * p_get_double(2) * 2.54;
-	z = 36.0 * m_scaling * p_get_double(4) * 2.54;
-	/*
+	x = 36.0 * m_scaling * p_get_double(0) * 25.4;
+	y = 36.0 * m_scaling * p_get_double(2) * 25.4;
+	z = 36.0 * m_scaling * p_get_double(4) * 25.4;
+
 	// angles
 	ax = 180.0 * p_get_double(24);
 	ay = 180.0 * p_get_double(26);
 	az = 180.0 * p_get_double(28);
 
 	double d2r = M_PI / 180.0;
+	double r2d = 180.0 / M_PI;
 	matrix[0][0] =  cos(d2r * ay) * cos(d2r * az);
 	matrix[0][1] =  cos(d2r * ay) * sin(d2r * az);
 	matrix[0][2] = -sin(d2r * ay);
@@ -176,10 +177,9 @@ void ATC3DGTracker::update(
 	matrix[2][0] =  (sin(d2r * ax) * sin(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
 	matrix[2][1] = -(sin(d2r * ax) * cos(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
 	matrix[2][2] =  cos(d2r * ax) * cos(d2r * ay);
-	*/
 
 	// matrix
-	int offset = 6;
+	/*int offset = 6;
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
@@ -187,11 +187,11 @@ void ATC3DGTracker::update(
 			int idx = i * 3 + j;
 			matrix[i][j] = p_get_double(offset + idx * 2);
 		}
-	}
+	}*/
 	
 	
 
-	if (sensor == 0)
+	/*if (sensor == 0)
 	{	
 		std::cout << "\n---" << std::endl;
 		// Print raw two byte packages
@@ -199,7 +199,7 @@ void ATC3DGTracker::update(
 		{
 			std::cout << "Byte " << i*2 << "to" << i*2+1 << ": " << std::setprecision(2) << std::fixed << p_get_double(i*2) << std::endl;
 		}
-	}
+	}*/
 	
 
 	q0 = p_get_double(30);

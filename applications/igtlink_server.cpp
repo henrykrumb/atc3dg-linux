@@ -16,7 +16,31 @@
 #include "CLI/Formatter.hpp"
 #include "CLI/Config.hpp"
 
+#include <vtkMatrix4x4.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+
+
 static bool running;
+
+
+void arrayToVTKMatrix(vtkSmartPointer<vtkMatrix4x4> vtkmatrix, float (&matrix)[4][4])
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            vtkmatrix->SetElement(i, j, matrix[i][j]);
+        }
+    }
+}
+
+void arrayToVTKTransform(vtkSmartPointer<vtkTransform> vtktransform, float (&matrix)[4][4])
+{
+    auto vtkmatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    arrayToVTKMatrix(vtkmatrix, matrix);
+    vtktransform->SetMatrix(vtkmatrix);
+}
 
 void signal_handler(int signum)
 {
@@ -72,7 +96,6 @@ int main(int argc, char *argv[])
 
     signal(SIGINT, signal_handler);
 
-
     // trakSTAR return values
     double position[] = {0.0, 0.0, 0.0};
     double quaternion[] = {0.0, 0.0, 0.0, 0.0};
@@ -85,6 +108,9 @@ int main(int argc, char *argv[])
     bool button = false;
 
     float igtmatrix[4][4];
+    float tool[4][4];
+    float reference[4][4];
+    float tool2reference[4][4];
     // igtl::TransformElement::Pointer transform_element_ptr;
 
     bool connected = false;
@@ -112,9 +138,9 @@ int main(int argc, char *argv[])
 
             for (int sensor = 0; sensor < num_sensors; sensor++)
             {
-                //std::cout << "sensor " << sensor << std::endl;
+                // std::cout << "sensor " << sensor << std::endl;
                 auto transform_message = igtl::TransformMessage::New();
-                
+
                 std::string name;
                 switch (sensor)
                 {
@@ -124,12 +150,11 @@ int main(int argc, char *argv[])
                 case 1:
                     name = "Tool";
                     break;
-                
                 default:
                     name = "Unknown";
                     break;
                 }
-                
+
                 transform_message->SetDeviceName(name.c_str());
 
                 if (!dry)
@@ -141,8 +166,33 @@ int main(int argc, char *argv[])
                 {
                     for (int i = 0; i < 3; i++)
                     {
+                        if (sensor == 0) {
+                            reference[i][j] = static_cast<float>(atcmatrix[i][j]);
+                        }
+                        if (sensor == 1) {
+                            tool[i][j] = static_cast<float>(atcmatrix[i][j]);
+                        }
                         igtmatrix[i][j] = static_cast<float>(atcmatrix[i][j]);
                     }
+                }
+
+                if (sensor == 0) {
+                    reference[3][0] = 0.0f;
+                    reference[3][1] = 0.0f;
+                    reference[3][2] = 0.0f;
+                    reference[0][3] = position[0];
+                    reference[1][3] = position[1];
+                    reference[2][3] = position[2];
+                    reference[3][3] = 1.0f;
+                }
+                if (sensor == 1) {
+                    tool[3][0] = 0.0f;
+                    tool[3][1] = 0.0f;
+                    tool[3][2] = 0.0f;
+                    tool[0][3] = position[0];
+                    tool[1][3] = position[1];
+                    tool[2][3] = position[2];
+                    tool[3][3] = 1.0f;
                 }
 
                 igtmatrix[3][0] = 0.0f;
@@ -154,12 +204,40 @@ int main(int argc, char *argv[])
                 igtmatrix[3][3] = 1.0f;
                 transform_message->SetMatrix(igtmatrix);
                 transform_message->Pack();
-                
+
                 if (!client_socket->Send(transform_message->GetPackPointer(), transform_message->GetPackSize()))
                 {
                     break;
                 }
             }
+
+            auto toolTransform = vtkSmartPointer<vtkTransform>::New();
+            arrayToVTKTransform(toolTransform, tool);
+
+            auto referenceTransform = vtkSmartPointer<vtkTransform>::New();
+            arrayToVTKTransform(referenceTransform, reference);
+
+            auto toolToReferenceTransform = vtkSmartPointer<vtkTransform>::New();
+            toolToReferenceTransform->Concatenate(toolTransform);
+            toolToReferenceTransform->Concatenate(referenceTransform);
+            toolToReferenceTransform->Update();
+
+            auto transform_message = igtl::TransformMessage::New();
+            transform_message->SetDeviceName("ToolToReference");
+            auto toolToReferenceMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+            toolToReferenceTransform->GetMatrix(toolToReferenceMatrix);
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    tool2reference[i][j] = toolToReferenceMatrix->GetElement(i, j);
+                }
+            }
+            transform_message->SetMatrix(tool2reference);
+            transform_message->Pack();
+            if (!client_socket->Send(transform_message->GetPackPointer(), transform_message->GetPackSize()))
+            {
+                // ...
+            }
+
 
             igtl::Sleep(interval);
         }

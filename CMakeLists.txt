@@ -31,7 +31,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(OpenIGTLink)
 
-include(FetchContent)
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
@@ -41,11 +40,16 @@ FetchContent_MakeAvailable(cli11)
 
 
 # build igtlink server
+#find_package(IGSIO REQUIRED)
+find_package(VTK REQUIRED)
+include_directories(${VTK_INCLUDE_DIRS})
+include(${VTK_USE_FILE})
+
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 include_directories(${cli11_SOURCE_DIR}/include)
 add_executable(atcigtlinkserver applications/igtlink_server.cpp)
-target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink)
+target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink ${VTK_LIBRARIES})
 set_target_properties(atcigtlinkserver PROPERTIES OUTPUT_NAME atcigtlinkserver)
 
 
