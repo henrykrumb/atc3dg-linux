@@ -134,7 +134,7 @@ double ATC3DGTracker::p_get_double(int byte1, int byte2)
 		byte2 = byte1 + 1;
 	}
 	
-	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1] & 0x7F & 0x7f))<<2;
+	short v = ((m_input_buf[byte2] << 7) | (m_input_buf[byte1] & 0x7F)) << 2;
 	return (double)v / 0x8000;
 }
 
@@ -168,7 +168,7 @@ void ATC3DGTracker::update(
 
 	double d2r = M_PI / 180.0;
 	double r2d = 180.0 / M_PI;
-	matrix[0][0] =  cos(d2r * ay) * cos(d2r * az);
+	/*matrix[0][0] =  cos(d2r * ay) * cos(d2r * az);
 	matrix[0][1] =  cos(d2r * ay) * sin(d2r * az);
 	matrix[0][2] = -sin(d2r * ay);
 	matrix[1][0] = -(cos(d2r * ax) * sin(d2r * az)) + (sin(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
@@ -176,10 +176,10 @@ void ATC3DGTracker::update(
 	matrix[1][2] =  sin(d2r * ax) * cos(d2r * ay);
 	matrix[2][0] =  (sin(d2r * ax) * sin(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * cos(d2r * az));
 	matrix[2][1] = -(sin(d2r * ax) * cos(d2r * az)) + (cos(d2r * ax) * sin(d2r * ay) * sin(d2r * az));
-	matrix[2][2] =  cos(d2r * ax) * cos(d2r * ay);
+	matrix[2][2] =  cos(d2r * ax) * cos(d2r * ay);*/
 
 	// matrix
-	/*int offset = 6;
+	int offset = 6;
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
@@ -187,7 +187,7 @@ void ATC3DGTracker::update(
 			int idx = i * 3 + j;
 			matrix[i][j] = p_get_double(offset + idx * 2);
 		}
-	}*/
+	}
 	
 	
 

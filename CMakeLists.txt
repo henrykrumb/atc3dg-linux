@@ -43,7 +43,6 @@ FetchContent_MakeAvailable(cli11)
 #find_package(IGSIO REQUIRED)
 find_package(VTK REQUIRED)
 include_directories(${VTK_INCLUDE_DIRS})
-include(${VTK_USE_FILE})
 
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})

@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
         interval = (int)(1000.0 / 80.0);
     }
 
+
     signal(SIGINT, signal_handler);
 
     // trakSTAR return values
@@ -138,7 +139,6 @@ int main(int argc, char *argv[])
 
             for (int sensor = 0; sensor < num_sensors; sensor++)
             {
-                // std::cout << "sensor " << sensor << std::endl;
                 auto transform_message = igtl::TransformMessage::New();
 
                 std::string name;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
                     reference[2][3] = position[2];
                     reference[3][3] = 1.0f;
                 }
-                if (sensor == 1) {
+                else if (sensor == 1) {
                     tool[3][0] = 0.0f;
                     tool[3][1] = 0.0f;
                     tool[3][2] = 0.0f;
@@ -211,6 +211,7 @@ int main(int argc, char *argv[])
                 }
             }
 
+            // compute ToolToReference transform
             auto toolTransform = vtkSmartPointer<vtkTransform>::New();
             arrayToVTKTransform(toolTransform, tool);
 
@@ -218,8 +219,10 @@ int main(int argc, char *argv[])
             arrayToVTKTransform(referenceTransform, reference);
 
             auto toolToReferenceTransform = vtkSmartPointer<vtkTransform>::New();
-            toolToReferenceTransform->Concatenate(toolTransform);
+            toolToReferenceTransform->Identity();
+            referenceTransform->Inverse();
             toolToReferenceTransform->Concatenate(referenceTransform);
+            toolToReferenceTransform->Concatenate(toolTransform);
             toolToReferenceTransform->Update();
 
             auto transform_message = igtl::TransformMessage::New();
