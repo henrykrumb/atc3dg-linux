@@ -40,16 +40,18 @@ FetchContent_MakeAvailable(cli11)
 
 
 # build igtlink server
-#find_package(IGSIO REQUIRED)
-find_package(VTK REQUIRED)
-include_directories(${VTK_INCLUDE_DIRS})
 
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 include_directories(${cli11_SOURCE_DIR}/include)
 add_executable(atcigtlinkserver applications/igtlink_server.cpp)
-target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink ${VTK_LIBRARIES})
+target_link_libraries(atcigtlinkserver atc3dg OpenIGTLink)
 set_target_properties(atcigtlinkserver PROPERTIES OUTPUT_NAME atcigtlinkserver)
+
+
+add_executable(test_vector test/test_vector.cpp)
+target_link_libraries(test_vector atc3dg)
+set_target_properties(test_vector PROPERTIES OUTPUT_NAME test_vector)
 
 
 install(
@@ -65,7 +67,7 @@ install(
 )
 
 install(
-	FILES include/atc3dg.hpp
+	FILES include/atc3dg.hpp include/matrix.hpp include/matrix.tpp include/vector.hpp include/vector.hpp
 	DESTINATION include
 	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
 )
