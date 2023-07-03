@@ -54,10 +54,12 @@ template <int N>
 void QuadMatrix<N>::set(const int i, const float value, const bool row_first)
 {
     // TODO assert 0 <= i < N * N
-    if (row_first) {
+    if (row_first)
+    {
         m_data[i % N][i / N] = value;
     }
-    else {
+    else
+    {
         m_data[i / N][i % N] = value;
     }
 }
@@ -175,6 +177,7 @@ QuadMatrix<N - 1> QuadMatrix<N>::minor(const int strike_row, const int strike_co
             mj++;
         }
         mi++;
+        mj = 0;
     }
     return minor_matrix;
 }
@@ -234,4 +237,20 @@ QuadMatrix<N> QuadMatrix<N>::transpose()
     }
 
     return T;
+}
+
+template <int N>
+bool QuadMatrix<N>::equals(const QuadMatrix<N> &other) const
+{
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if (m_data[i][j] != other.m_data[i][j])
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }

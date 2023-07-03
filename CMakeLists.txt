@@ -38,6 +38,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cli11)
 
+FetchContent_Declare(
+	json
+	GIT_REPOSITORY https://github.com/nlohmann/json.git
+	GIT_TAG v3.11.2
+)
+FetchContent_MakeAvailable(json)
+
 
 # build igtlink server
 
@@ -52,6 +59,10 @@ set_target_properties(atcigtlinkserver PROPERTIES OUTPUT_NAME atcigtlinkserver)
 add_executable(test_vector test/test_vector.cpp)
 target_link_libraries(test_vector atc3dg)
 set_target_properties(test_vector PROPERTIES OUTPUT_NAME test_vector)
+
+add_executable(test_matrix test/test_matrix.cpp)
+target_link_libraries(test_matrix atc3dg)
+set_target_properties(test_matrix PROPERTIES OUTPUT_NAME test_matrix)
 
 
 install(

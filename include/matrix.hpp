@@ -28,6 +28,10 @@ public:
     QuadMatrix inverse();
     QuadMatrix transpose();
 
+    bool equals(const QuadMatrix& other) const;
+    bool operator==(const QuadMatrix& other) { return equals(other); }
+    bool operator!=(const QuadMatrix& other) { return !equals(other); }
+
     // TODO: overload operators
 
 protected:
