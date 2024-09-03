@@ -27,7 +27,7 @@ You may need to restart your computer after installation.
 
 ## Drop-in replacement for PlusServer ##
 
-The "igtlink_server" (compiles to "atcigtlink" executable) serves as a drop-in replacement for what would usually be done with PlusLib's PlusServer, and follows a naming convention similar to most examples you'll find on the internet.
+The "igtlink_server" (compiles to "atcigtlinkserver" executable) serves as a drop-in replacement for what would usually be done with PlusLib's PlusServer, and follows a naming convention similar to most examples you'll find on the internet.
 
 The sensor on 1st port is assigned "Reference", and the 2nd sensor is assigned "Tool". A transform "ToolToReference" is computed as well, and all transforms
 are sent via IGTLink protocol.
